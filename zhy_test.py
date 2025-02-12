@@ -5,11 +5,11 @@ from transformers import AutoTokenizer
 from datasets import load_dataset
 
 
-x_np = np.array([[1, 2], [3, 4], [5, 6]])
-# x_np = np.array([1, 2, 3, 4])
-x_pt = torch.from_numpy(x_np)
-
-x_np_new = x_np.astype(np.int).argmax(axis=1)
+# x_np = np.array([[1, 2], [3, 4], [5, 6]])
+# # x_np = np.array([1, 2, 3, 4])
+# x_pt = torch.from_numpy(x_np)
+#
+# x_np_new = x_np.astype(np.int).argmax(axis=1)
 
 # print(f"{x_np[None].repeat(2, 0)=}")
 # print(f"{x_pt.expand(2, -1)=}")
@@ -75,5 +75,16 @@ x_np_new = x_np.astype(np.int).argmax(axis=1)
 #
 # ds = load_dataset("Jiayi-Pan/Countdown-Tasks-3to4")
 
+from src.dataset import create_countdown_dataset
+
+tokenizer = AutoTokenizer.from_pretrained("/Users/zhanghuiyao/Downloads/Qwen/Qwen2.5-1.5B-Instruct")
+tokenizer.pad_token = tokenizer.eos_token
+
+ms_train_dataset, _ = create_countdown_dataset(tokenizer=tokenizer)
+
+for step, batch in enumerate(ms_train_dataset):
+    batch = batch["item"]
+    print(batch)
+    import pdb;pdb.set_trace()
 
 import pdb;pdb.set_trace()

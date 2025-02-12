@@ -47,8 +47,10 @@ class GRPO(nn.Cell):
                 rm.set_train(False)
 
     def get_completion_and_reward(self, batch):
-        prompts, prompt_ids, attention_mask, targets = \
-            batch["prompts"], batch["prompt_ids"], batch["attention_mask"], batch["targets"]
+        prompts, nums, targets, prompt_ids, attention_mask = \
+            batch["prompts"], batch["nums"], batch["targets"], batch["prompt_ids"], batch["attention_mask"]
+        prompts = np.array(prompts).tolist()
+        nums = [np.array(b).tolist() for b in batch["nums"]]
 
         # FIXME: unpad
         assert prompt_ids.shape[0] == 1, "not support bs>1 when generate task"
@@ -80,7 +82,7 @@ class GRPO(nn.Cell):
 
         rewards_per_func = np.zeros((len(prompt_ids), len(self.reward_funcs)), dtype=np.float32)
         for i, reward_func in enumerate(self.reward_funcs):
-            rewards_per_func[:, i] = reward_func(prompts, completions, targets)  # Shape (B*G,)
+            rewards_per_func[:, i] = reward_func(completions=completions, nums=nums, targets=targets, prompt=prompts)  # Shape (B*G,)
         rewards = rewards_per_func.sum(axis=1)
 
         return prompt_completion_ids, num_logits_to_keep, completion_mask, rewards

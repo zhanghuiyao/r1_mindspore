@@ -54,6 +54,8 @@ def create_countdown_dataset(
         first = inputs[0]
         assert isinstance(first, dict)
         prompts = [x["prompt"] for x in inputs]
+        nums = [x["nums"] for x in inputs]
+        targets = np.array([int(x["target"]) for x in inputs])
         # prompt_inputs = tokenizer(prompts, return_tensors="np", padding=True, padding_side="left", add_special_tokens=False)
         prompt_inputs = tokenizer(
             prompts,
@@ -66,9 +68,10 @@ def create_countdown_dataset(
         )
         batch = {
             "prompts": prompts,
+            "nums": nums,
+            "targets": targets,
             "prompt_ids": prompt_inputs.input_ids,
             "attention_mask": prompt_inputs.attention_mask,
-            "targets": np.array([int(x["target"]) for x in inputs])
         }
         return batch
 
