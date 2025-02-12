@@ -62,7 +62,6 @@ class GRPO(nn.Cell):
             max_new_tokens=self.max_completion_length,
             use_cache=False,
         )
-        prompt_length = prompt_ids.shape[1]
         completion_ids = completion_ids.asnumpy()
         prompt_completion_ids = np.concatenate([prompt_ids.repeat(self.num_generations, axis=0), completion_ids], axis=-1)
         num_logits_to_keep = completion_ids.shape[1]

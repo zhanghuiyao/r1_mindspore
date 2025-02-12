@@ -4,7 +4,7 @@
 import re
 
 
-def format_reward(completions: list[str], **kwargs) -> list[float]:
+def format_reward(completions: list[str], *args, **kwargs) -> list[float]:
     """Reward function that checks if the completion has a specific format."""
     pattern = r"^<think>.*?</think>\s*<answer>.*?</answer>$"
     # add synthetic <think> as its already part of the prompt and prefilled for the assistant to more easily match the regex
@@ -12,14 +12,14 @@ def format_reward(completions: list[str], **kwargs) -> list[float]:
     return [1.0 if match else 0.0 for match in matches]
 
 
-def countdown_game_accuracy_reward(completions, nums, targets, **kwargs) -> list[float]:
+def countdown_game_accuracy_reward(completions: list[str], nums: int, targets: int, *args, **kwargs) -> list[float]:
     """
     For Countdown Game, evaluates completions based on: Mathematical correctness of the answer
 
     Args:
         completions (list[str]): Generated outputs
-        targets (list[str]): Expected answers
-        nums (list[str]): Available numbers
+        targets (int): Expected answers
+        nums (int): Available numbers
 
     Returns:
         list[float]: Reward scores
