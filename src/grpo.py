@@ -55,7 +55,7 @@ class GRPO(nn.Cell):
         prompt_ids = prompt_ids[:, :attention_mask.sum()]
         attention_mask = attention_mask[:, :attention_mask.sum()]
 
-        prompt_completion_ids = self.policy_model.generate(
+        completion_ids = self.policy_model.generate(
             input_ids=Tensor(prompt_ids, ms.int32),
             attention_mask=Tensor(attention_mask, ms.bool_),
             generation_config=self.generation_config,
@@ -63,7 +63,8 @@ class GRPO(nn.Cell):
             use_cache=False,
         )
         prompt_length = prompt_ids.shape[1]
-        completion_ids = prompt_completion_ids.asnumpy()[:, prompt_length:]
+        completion_ids = completion_ids.asnumpy()[:, prompt_length:]
+        prompt_completion_ids = np.concatenate([prompt_ids.repeat(self.num_generations, axis=0), completion_ids], axis=-1)
         num_logits_to_keep = completion_ids.shape[1]
 
         # Mask everything after the first EOS token
