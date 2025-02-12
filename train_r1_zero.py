@@ -47,7 +47,7 @@ def main():
     print(f"{args=}")
 
     # 0. set mindspore context
-    ms.set_context(mode=ms.GRAPH_MODE, jit_config={"jit_level": "O0"})  # FIXME
+    ms.set_context(mode=ms.PYNATIVE_MODE, jit_config={"jit_level": "O0"})  # FIXME
     if args.is_distribute:
         from mindspore.communication import get_group_size, get_rank, init
 
