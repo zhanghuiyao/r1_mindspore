@@ -80,7 +80,7 @@ class GRPO(nn.Cell):
         completions = self.tokenizer.batch_decode(completion_ids, skip_special_tokens=True)
         prompts = [prompt for prompt in prompts for _ in range(self.num_generations)]
 
-        rewards_per_func = np.zeros((len(prompt_ids), len(self.reward_funcs)), dtype=np.float32)
+        rewards_per_func = np.zeros((len(prompts), len(self.reward_funcs)), dtype=np.float32)
         for i, reward_func in enumerate(self.reward_funcs):
             rewards_per_func[:, i] = reward_func(completions=completions, nums=nums, targets=targets, prompt=prompts)  # Shape (B*G,)
         rewards = rewards_per_func.sum(axis=1)

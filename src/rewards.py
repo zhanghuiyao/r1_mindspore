@@ -3,16 +3,18 @@
 # https://github.com/philschmid/deep-learning-pytorch-huggingface/blob/main/training/mini-deepseek-r1-aha-grpo.ipynb
 import re
 
+import numpy as np
 
-def format_reward(completions: list[str], *args, **kwargs) -> list[float]:
+
+def format_reward(completions: list[str], *args, **kwargs) -> np.ndarray:
     """Reward function that checks if the completion has a specific format."""
     pattern = r"^<think>.*?</think>\s*<answer>.*?</answer>$"
     # add synthetic <think> as its already part of the prompt and prefilled for the assistant to more easily match the regex
     matches = [re.match(pattern, "<think>" + content, re.DOTALL | re.MULTILINE) for content in completions]
-    return [1.0 if match else 0.0 for match in matches]
+    return np.array([1.0 if match else 0.0 for match in matches])
 
 
-def countdown_game_accuracy_reward(completions: list[str], nums: int, targets: int, *args, **kwargs) -> list[float]:
+def countdown_game_accuracy_reward(completions: list[str], nums: int, targets: int, *args, **kwargs) -> np.ndarray:
     """
     For Countdown Game, evaluates completions based on: Mathematical correctness of the answer
 
@@ -57,4 +59,4 @@ def countdown_game_accuracy_reward(completions: list[str], nums: int, targets: i
         except Exception:
             # If evaluation fails, reward is 0
             rewards.append(0.0)
-    return rewards
+    return np.array(rewards)
