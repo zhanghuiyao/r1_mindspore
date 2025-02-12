@@ -60,6 +60,7 @@ class GRPO(nn.Cell):
             attention_mask=Tensor(attention_mask, ms.bool_),
             generation_config=self.generation_config,
             max_new_tokens=self.max_completion_length,
+            use_cache=False,
         )
         prompt_length = prompt_ids.shape[1]
         completion_ids = prompt_completion_ids.asnumpy()[:, prompt_length:]
