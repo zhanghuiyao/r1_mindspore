@@ -70,7 +70,7 @@ class GRPO(nn.Cell):
         is_eos = np.array(completion_ids == self.tokenizer.eos_token_id)
         eos_idx = np.full((is_eos.shape[0],), is_eos.shape[1], dtype=np.int)
         eos_idx[is_eos.any(axis=1)] = is_eos.astype(np.int).argmax(axis=1)[is_eos.any(axis=1)]
-        sequence_indices = np.arange(is_eos.shape[1])[None].repeat(is_eos.size(0), axis=0)
+        sequence_indices = np.arange(is_eos.shape[1])[None].repeat(is_eos.shape[0], axis=0)
         completion_mask = (sequence_indices <= eos_idx[:, None]).astype(np.int)
 
         # get reward
