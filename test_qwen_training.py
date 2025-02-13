@@ -120,7 +120,7 @@ def run():
 
     optimizer = nn.AdamWeightDecay(policy_model.trainable_params(), learning_rate=5e-7)
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
     tokenizer.pad_token = tokenizer.eos_token
 
     grpo_model = GRPO(policy_model, reference_model, [format_reward, countdown_game_accuracy_reward], tokenizer, args)

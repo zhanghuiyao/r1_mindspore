@@ -47,7 +47,7 @@ def main():
     print(f"{args=}")
 
     # 0. set mindspore context
-    ms.set_context(mode=ms.GRAPH_MODE, jit_config={"jit_level": "O0"}, pynative_synchronize=True)  # FIXME
+    ms.set_context(mode=ms.GRAPH_MODE, jit_config={"jit_level": "O0"}, pynative_synchronize=True)
     if args.is_distribute:
         from mindspore.communication import get_group_size, get_rank, init
 
@@ -78,13 +78,13 @@ def main():
     # 2. create train network and mix precision
     policy_model = Qwen2ForCausalLM.from_pretrained(
         args.model_path,
-        use_flash_attention_2=False,  #True,  # FIXME, for mac
+        use_flash_attention_2=True,
         mindspore_dtype=ms.bfloat16 if args.bf16 else (ms.float16 if args.fp16 else None),
         return_dict=False,
     )
     reference_model = Qwen2ForCausalLM.from_pretrained(
         args.model_path,
-        use_flash_attention_2=False,  #True, # FIXME, for mac
+        use_flash_attention_2=True,
         mindspore_dtype=ms.bfloat16 if args.bf16 else (ms.float16 if args.fp16 else None),
         return_dict=False,
     )
