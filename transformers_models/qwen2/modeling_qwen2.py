@@ -963,7 +963,7 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel):
         if attention_mask is not None and position_ids is None:
             # create position_ids on the fly for batch generation
             position_ids = attention_mask.to(ms.int32).cumsum(-1) - 1  # FIXME
-            position_ids.masked_fill(attention_mask == 0, 1)
+            position_ids = position_ids.masked_fill(attention_mask == 0, 1)
             if past_key_values:
                 position_ids = position_ids[:, -input_ids.shape[1] :]
 
@@ -977,6 +977,12 @@ class Qwen2ForCausalLM(Qwen2PreTrainedModel):
         if inputs_embeds is not None and cache_position[0] == 0:
             model_inputs = {"inputs_embeds": inputs_embeds}
         else:
+
+            # Padding to max_len when no cache
+            if past_key_values is None:
+                pad_len = max(0, attention_mask.shape[1] - input_ids.shape[1])
+                input_ids = ops.pad(input_ids, (0, pad_len), value=0)
+
             model_inputs = {"input_ids": input_ids}
 
         if isinstance(past_key_values, StaticCache) and attention_mask.ndim == 2:

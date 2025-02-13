@@ -69,7 +69,7 @@ def run():
                                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], np.int32)
     }
 
-    ms.set_context(mode=ms.GRAPH_MODE, jit_config={"jit_level": "O0"}, pynative_synchronize=True)  # FIXME
+    ms.set_context(mode=ms.PYNATIVE_MODE, jit_config={"jit_level": "O0"}, pynative_synchronize=True)  # FIXME
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-path", type=str, default="Qwen/Qwen2.5-1.5B-Instruct", help="pretrained model")
