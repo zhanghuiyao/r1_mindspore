@@ -78,13 +78,13 @@ def main():
     # 2. create train network and mix precision
     policy_model = Qwen2ForCausalLM.from_pretrained(
         args.model_path,
-        use_flash_attention_2=True,
+        use_flash_attention_2=False,
         mindspore_dtype=ms.bfloat16 if args.bf16 else (ms.float16 if args.fp16 else None),
         return_dict=False,
     )
     reference_model = Qwen2ForCausalLM.from_pretrained(
         args.model_path,
-        use_flash_attention_2=True,
+        use_flash_attention_2=False,
         mindspore_dtype=ms.bfloat16 if args.bf16 else (ms.float16 if args.fp16 else None),
         return_dict=False,
     )
