@@ -104,11 +104,13 @@ def run():
         model_path,
         use_flash_attention_2=False,  # True,  # FIXME, for mac
         mindspore_dtype=ms.float16,
+        return_dict=False,
     )
     reference_model = Qwen2ForCausalLM.from_pretrained(
         model_path,
         use_flash_attention_2=False,  # True, # FIXME, for mac
         mindspore_dtype=dtype,
+        return_dict=False,
     )
 
     policy_model.gradient_checkpointing_enable()

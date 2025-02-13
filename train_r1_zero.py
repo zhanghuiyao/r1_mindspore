@@ -80,11 +80,13 @@ def main():
         args.model_path,
         use_flash_attention_2=False,  #True,  # FIXME, for mac
         mindspore_dtype=ms.bfloat16 if args.bf16 else (ms.float16 if args.fp16 else None),
+        return_dict=False,
     )
     reference_model = Qwen2ForCausalLM.from_pretrained(
         args.model_path,
         use_flash_attention_2=False,  #True, # FIXME, for mac
         mindspore_dtype=ms.bfloat16 if args.bf16 else (ms.float16 if args.fp16 else None),
+        return_dict=False,
     )
 
     policy_model.gradient_checkpointing_enable()
