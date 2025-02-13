@@ -15,7 +15,7 @@ from src.rewards import format_reward, countdown_game_accuracy_reward
 
 
 def run():
-    model_path = "Qwen/Qwen2.5-1.5B-Instruct"
+    model_path = "/Users/zhanghuiyao/Desktop/_R1/r1_mindspore/hf_configs/Qwen/Qwen2.5-1.5B-Instruct"
     dtype = ms.float16
 
     batch = {
@@ -78,7 +78,7 @@ def run():
     parser.add_argument("--learning-rate", type=float, default=5e-7)
     parser.add_argument("--lr-scheduler-type", type=str, default="cosine")  # FIXME
     parser.add_argument("--max-prompt-length", type=int, default=256)
-    parser.add_argument("--max-completion-length", type=int, default=1024)
+    parser.add_argument("--max-completion-length", type=int, default=3)  # 1024
     parser.add_argument("--num-generations", type=int, default=2)
     parser.add_argument("--beta", type=float, default=0.001)
     parser.add_argument("--temperature", type=float, default=0.9)
@@ -137,14 +137,20 @@ def run():
     # 3. training
     train_model.set_train()
 
-    prompt_completion_ids, num_logits_to_keep, completion_mask, rewards = \
-        grpo_model.get_completion_and_reward(batch)
+    for step in range(2):
 
-    loss, _, overflow = train_model(
-        ms.Tensor(prompt_completion_ids, ms.int32),
-        num_logits_to_keep,
-        ms.Tensor(completion_mask, ms.bool_),
-        ms.Tensor(rewards, ms.float32),
-    )
+        prompt_completion_ids, num_logits_to_keep, completion_mask, rewards = \
+            grpo_model.get_completion_and_reward(batch)
 
-    print(f"training loss: {loss}")
+        loss, _, overflow = train_model(
+            ms.Tensor(prompt_completion_ids, ms.int32),
+            num_logits_to_keep,
+            ms.Tensor(completion_mask, ms.bool_),
+            ms.Tensor(rewards, ms.float32),
+        )
+
+        print(f"step: {step}, training loss: {loss}")
+
+
+if __name__ == '__main__':
+    run()

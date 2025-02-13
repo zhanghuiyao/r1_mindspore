@@ -6,8 +6,8 @@ import numpy as np
 from typing import Dict
 from transformers import AutoTokenizer
 from mindone.transformers.mindspore_adapter import HF2MSDataset, TrainOneStepWrapper, auto_mixed_precision
-# from transformers_models.qwen2 import Qwen2ForCausalLM  # FIXME: mindone pr833
-from mindone.transformers.models.llama import LlamaForCausalLM as Qwen2ForCausalLM
+from transformers_models.qwen2 import Qwen2ForCausalLM  # FIXME: mindone pr833
+# from mindone.transformers.models.llama import LlamaForCausalLM as Qwen2ForCausalLM
 
 import mindspore as ms
 from mindspore import nn
@@ -47,7 +47,7 @@ def main():
     print(f"{args=}")
 
     # 0. set mindspore context
-    ms.set_context(mode=ms.PYNATIVE_MODE, jit_config={"jit_level": "O0"}, pynative_synchronize=True)  # FIXME
+    ms.set_context(mode=ms.GRAPH_MODE, jit_config={"jit_level": "O0"}, pynative_synchronize=True)  # FIXME
     if args.is_distribute:
         from mindspore.communication import get_group_size, get_rank, init
 
