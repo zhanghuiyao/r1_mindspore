@@ -105,10 +105,16 @@ class GRPO(nn.Cell):
         advantages = (rewards - mean_grouped_rewards) / (std_grouped_rewards + 1e-4)
 
         # 2. compute kl divergence
-        per_token_logps = self.get_per_token_logps(
-            self.policy_model.logits(prompt_completion_ids, num_logits_to_keep + 1))
-        ref_per_token_logps = self.get_per_token_logps(
-            self.reference_model.logits(prompt_completion_ids, num_logits_to_keep + 1))
+        per_token_logps = self.get_log_probabilities(
+            prompt_completion_ids,
+            self.policy_model(prompt_completion_ids)[0],
+            num_logits_to_keep,
+        )
+        ref_per_token_logps = self.get_log_probabilities(
+            prompt_completion_ids,
+            self.reference_model(prompt_completion_ids)[0],
+            num_logits_to_keep,
+        )
         kl_divergence = ops.exp(ref_per_token_logps - per_token_logps) - (ref_per_token_logps - per_token_logps) - 1
 
         # x - x.detach() allows for preserving gradients from x
@@ -118,16 +124,21 @@ class GRPO(nn.Cell):
 
         return loss
 
-    def get_log_probabilities(self, input_ids: Tensor, logits: Tensor) -> Tensor:
-        # logits: (B, L, V)
-        logits = logits[:, :-1, :]  # (B, L-1, V), exclude the last logit: it corresponds to the next token pred
-        num_logits_to_keep = logits.shape[1]
+    @ms.jit
+    def get_log_probabilities(self, input_ids: Tensor, logits: Tensor, num_logits_to_keep: int) -> Tensor:
+        # logits: (B, L, V), prompt_completion_logits -> completion_logits
+        logits = logits[:, -(num_logits_to_keep+1):-1, :]
 
         # Compute the log probabilities for the input tokens. Use a loop to reduce memory peak.
-        per_token_logps = []
-        for logits_row, input_ids_row in zip(logits, input_ids[:, -num_logits_to_keep:]):
-            log_probs = logits_row.log_softmax(dim=-1)
+        per_token_logps = ()
+
+        # FIXME: zhy_test
+        # for logits_row, input_ids_row in zip(logits, input_ids[:, -num_logits_to_keep:]):
+        for i in range(logits.shape[0]):
+            logits_row, input_ids_row = logits[i], input_ids[i, -num_logits_to_keep:]
+
+            log_probs = ops.log_softmax(logits_row, axis=-1)
             token_log_prob = ops.gather_elements(log_probs, dim=1, index=input_ids_row.unsqueeze(1)).squeeze(1)
-            per_token_logps.append(token_log_prob)
+            per_token_logps += (token_log_prob,)
 
         return ops.stack(per_token_logps)
